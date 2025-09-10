@@ -1,0 +1,13 @@
+{
+  "keywords": [
+    { "word": "lernen", "xp": 10, "attribute": "fokus", "attributeGain": 1 },
+    { "word": "sport", "xp": 12, "attribute": "vitalitaet", "attributeGain": 1 },
+    { "word": "spazieren", "xp": 6, "attribute": "vitalitaet", "attributeGain": 1 },
+    { "word": "kontakt", "xp": 8, "attribute": "sozial", "attributeGain": 1 },
+    { "word": "routine", "xp": 5, "attribute": "disziplin", "attributeGain": 1 },
+    { "word": "meditation", "xp": 8, "attribute": "fokus", "attributeGain": 1 }
+  ],
+  "tuning": {
+    "version": 1
+  }
+}

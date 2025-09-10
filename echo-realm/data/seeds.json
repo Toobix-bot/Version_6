@@ -1,0 +1,7 @@
+{
+  "sampleQuests": [
+    { "title": "10 Min. Dehnen", "desc": "Starte mit leichter Mobilität.", "reward": { "xp": 12, "attribute": { "vitalitaet": 1 } } },
+    { "title": "Kurzer Sozial-Ping", "desc": "Schreibe einer Person eine Nachricht.", "reward": { "xp": 10, "attribute": { "sozial": 1 } } }
+  ],
+  "notes": "Seeds für spätere Erweiterung"
+}

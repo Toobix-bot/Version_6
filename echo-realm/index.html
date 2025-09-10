@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <title>ECHO-REALM: Diary RPG (MVP)</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <h1>ECHO-REALM</h1>
+    <div id="status-panel"></div>
+  </header>
+
+  <main>
+    <section id="entry-section">
+      <h2>Neuer Eintrag</h2>
+      <form id="entry-form">
+        <div class="field-group">
+          <label for="entry-date">Datum</label>
+          <input type="date" id="entry-date" required />
+        </div>
+        <div class="field-row">
+          <div>
+            <label for="mood">Stimmung (1-5)</label>
+            <input type="number" id="mood" min="1" max="5" />
+          </div>
+          <div>
+            <label for="energy">Energie (1-5)</label>
+            <input type="number" id="energy" min="1" max="5" />
+          </div>
+        </div>
+        <div class="field-group">
+          <label for="entry-text">Text</label>
+          <textarea id="entry-text" rows="6" placeholder="Was ist heute passiert?"></textarea>
+        </div>
+        <button type="submit">Speichern</button>
+      </form>
+      <div class="actions-inline">
+        <button id="btn-new-quest" type="button">Neue Quest</button>
+        <button id="btn-export" type="button">Export</button>
+        <label class="import-label">Import <input id="import-file" type="file" accept="application/json" hidden /></label>
+      </div>
+    </section>
+
+    <section id="quests-section">
+      <h2>Quests</h2>
+      <ul id="quest-list"></ul>
+    </section>
+
+    <section id="log-section">
+      <h2>Tageslog</h2>
+      <ul id="entry-log"></ul>
+    </section>
+
+    <section id="base-section">
+      <h2>Basis</h2>
+      <div id="base-view"></div>
+    </section>
+  </main>
+
+  <div id="toast-container" aria-live="polite"></div>
+
+  <footer>
+    <small>MVP – lokal, privat. Keine Netzwerk-Requests.</small>
+  </footer>
+  <script type="module" src="./src/main.js"></script>
+</body>
+</html>

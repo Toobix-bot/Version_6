@@ -1,0 +1,35 @@
+* { box-sizing: border-box; }
+body { font-family: system-ui, Arial, sans-serif; margin:0; padding:0; background:#111; color:#eee; }
+header { background:#181818; padding:1rem 1.5rem; display:flex; flex-direction:column; gap:.5rem; border-bottom:1px solid #333; }
+h1 { margin:0; font-size:1.4rem; letter-spacing:.05em; }
+main { display:grid; gap:1.2rem; padding:1rem 1.5rem; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); }
+section { background:#1d1d1d; padding:1rem; border:1px solid #2a2a2a; border-radius:8px; min-height:120px; }
+#entry-section { grid-column:1 / -1; }
+label { display:block; font-size:.8rem; text-transform:uppercase; letter-spacing:.05em; margin-bottom:.25rem; color:#aaa; }
+input[type=date], input[type=number], textarea { width:100%; background:#222; color:#eee; border:1px solid #333; border-radius:4px; padding:.5rem; font:inherit; }
+textarea { resize:vertical; }
+button { background:#3d4aff; color:#fff; border:none; padding:.55rem 1rem; border-radius:4px; cursor:pointer; font-weight:600; }
+button:hover { background:#5662ff; }
+.field-group { margin-bottom:.75rem; }
+.field-row { display:flex; gap:1rem; }
+.field-row > div { flex:1; }
+ul { list-style:none; margin:.5rem 0 0; padding:0; }
+#entry-log li, #quest-list li { padding:.5rem .6rem; border:1px solid #333; border-radius:4px; margin-bottom:.5rem; background:#222; font-size:.85rem; line-height:1.2rem; }
+.badge { display:inline-block; background:#2e2e2e; padding:.25rem .5rem; border-radius:999px; font-size:.65rem; margin-right:.25rem; }
+.xp-bar { background:#222; height:10px; border-radius:5px; overflow:hidden; border:1px solid #333; }
+.xp-bar span { display:block; height:100%; background:linear-gradient(90deg,#4e9dff,#6f4dff); }
+.status-attributes { display:flex; gap:.75rem; flex-wrap:wrap; margin-top:.4rem; }
+.attr { background:#222; padding:.4rem .6rem; border:1px solid #333; border-radius:6px; font-size:.7rem; display:flex; flex-direction:column; align-items:flex-start; }
+.attr strong { font-size:.75rem; }
+#toast-container { position:fixed; bottom:1rem; right:1rem; display:flex; flex-direction:column; gap:.5rem; }
+.toast { background:#222; color:#fff; padding:.6rem .8rem; border-radius:6px; border:1px solid #444; animation:fadeIn .3s ease; font-size:.75rem; max-width:260px; }
+@keyframes fadeIn { from { opacity:0; transform:translateY(4px);} to { opacity:1; transform:translateY(0);} }
+.actions-inline { display:flex; gap:.5rem; margin-top:.6rem; flex-wrap:wrap; }
+.import-label { background:#444; padding:.55rem 1rem; border-radius:4px; cursor:pointer; font-size:.8rem; font-weight:600; }
+.import-label:hover { background:#555; }
+footer { text-align:center; padding:1rem; font-size:.65rem; color:#777; }
+.responsive-flex { display:flex; gap:1rem; flex-wrap:wrap; }
+#base-view { font-size:.9rem; }
+.base-tier { font-size:1.1rem; font-weight:600; }
+.quest-actions { display:flex; gap:.4rem; margin-top:.4rem; }
+.quest-actions button { flex:1; font-size:.65rem; padding:.4rem .5rem; }
