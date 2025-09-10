@@ -33,3 +33,8 @@ footer { text-align:center; padding:1rem; font-size:.65rem; color:#777; }
 .base-tier { font-size:1.1rem; font-weight:600; }
 .quest-actions { display:flex; gap:.4rem; margin-top:.4rem; }
 .quest-actions button { flex:1; font-size:.65rem; padding:.4rem .5rem; }
+.history-filters { display:flex; gap:.4rem; flex-wrap:wrap; margin-bottom:.5rem; }
+.hf-btn { background:#262626; border:1px solid #333; padding:.4rem .6rem; font-size:.65rem; border-radius:4px; cursor:pointer; }
+.hf-btn.active { background:#3d4aff; border-color:#3d4aff; color:#fff; }
+.history-list li { font-size:.65rem; padding:.35rem .5rem; border:1px solid #333; background:#222; border-radius:4px; margin-bottom:.35rem; line-height:1.1rem; }
+.undo-link { color:#4e9dff; cursor:pointer; text-decoration:underline; font-size:.7rem; margin-left:.4rem; }

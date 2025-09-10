@@ -57,12 +57,23 @@
       <h2>Basis</h2>
       <div id="base-view"></div>
     </section>
+
+    <section id="history-section">
+      <h2>History</h2>
+      <div class="history-filters">
+        <button type="button" data-hfilter="ALL" class="hf-btn active">Alle</button>
+        <button type="button" data-hfilter="ENTRY" class="hf-btn">Entries</button>
+        <button type="button" data-hfilter="QUEST" class="hf-btn">Quests</button>
+        <button type="button" data-hfilter="LEVEL_UP" class="hf-btn">LevelUps</button>
+      </div>
+      <ul id="history-log" class="history-list"></ul>
+    </section>
   </main>
 
   <div id="toast-container" aria-live="polite"></div>
 
   <footer>
-    <small>MVP – lokal, privat. Keine Netzwerk-Requests.</small>
+    <small>MVP v<span id="app-version"></span> – lokal, privat. Keine Netzwerk-Requests.</small>
   </footer>
   <script type="module" src="./src/main.js"></script>
 </body>

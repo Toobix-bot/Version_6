@@ -27,3 +27,14 @@ export function sanitizeArray(arr, guard){
   if(!Array.isArray(arr)) return [];
   return arr.filter(guard);
 }
+
+// Future migration helper (v1 -> v2 skeleton)
+export function migrateStateIfNeeded(raw){
+  if(!raw || !raw.meta) return raw;
+  const v = raw.meta.version || 1;
+  if(v === 1){
+    // Example: ensure _lastEntryBackup field
+    if(typeof raw._lastEntryBackup === 'undefined') raw._lastEntryBackup = null;
+  }
+  return raw;
+}

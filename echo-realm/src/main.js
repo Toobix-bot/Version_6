@@ -1,6 +1,6 @@
 /* main.js - Bootstrapping */
 "use strict";
-import { getState, saveState, integrateEntryDerived, applyBaseProgress, getConfig } from './state.js';
+import { getState, saveState, integrateEntryDerived, applyBaseProgress, getConfig, undoLastEntry } from './state.js';
 import { deriveFromEntry, applyEntryDerived, summarizeEntry as summarizeDerived } from './logic.js';
 import { initUI, handleExport, handleImport } from './ui.js';
 import { generateQuest, completeQuest, skipQuest } from './quests.js';
@@ -58,8 +58,25 @@ async function onSubmitEntry(e){
   integrateEntryDerived(entry, derived);
   saveState();
   // Summarize (LLM Hook) - fallback summarization
-  try { const summary = await summarizeEntry(text, derived); emit('toast', summary); } catch {}
+  try { const summary = await summarizeEntry(text, derived); showUndoToast(summary); } catch { showUndoToast('Gespeichert'); }
   if(textEl) textEl.value='';
+}
+
+function showUndoToast(summary){
+  const cont = document.getElementById('toast-container'); if(!cont) return;
+  const div = document.createElement('div');
+  div.className = 'toast';
+  div.innerHTML = `${summary} <span class="undo-link" data-undo>Undo</span>`;
+  div.addEventListener('click', e=>{
+    const t = e.target; if(t instanceof HTMLElement && t.matches('[data-undo]')){
+      if(undoLastEntry()){
+        div.remove();
+        const d2 = document.createElement('div'); d2.className='toast'; d2.textContent='Eintrag zurückgerollt'; cont.appendChild(d2); setTimeout(()=>d2.remove(),3000);
+      }
+    }
+  });
+  cont.appendChild(div);
+  setTimeout(()=>{ div.remove(); }, 6000);
 }
 
 document.addEventListener('DOMContentLoaded', init);

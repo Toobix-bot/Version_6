@@ -1,6 +1,6 @@
 /* ui.js - Render Funktionen */
 "use strict";
-import { getState, exportState, importState } from './state.js';
+import { getState, exportState, importState, saveState } from './state.js';
 import { on, formatXP, emit } from './utils.js';
 
 export function initUI(){
@@ -15,6 +15,9 @@ export function initUI(){
   renderEntries();
   renderQuests();
   renderBase();
+  renderHistory();
+  injectVersion();
+  renderHistory();
 }
 
 export function renderStatus(){
@@ -67,6 +70,33 @@ export function renderBase(){
   const st = getState();
   const el = document.getElementById('base-view'); if(!el) return;
   el.innerHTML = `<div class="base-tier">${st.base.name} (Tier ${st.base.tier})</div><div>Slots: ${st.base.slots}</div>`;
+}
+
+export function renderHistory(){
+  const st = getState();
+  const list = document.getElementById('history-log'); if(!list) return;
+  const active = document.querySelector('.hf-btn.active');
+  const filter = active?.getAttribute('data-hfilter') || 'ALL';
+  const rows = st.history.slice(-300).reverse().filter(h=>{
+    if(filter==='ALL') return true;
+    if(filter==='ENTRY') return h.type.startsWith('ENTRY');
+    if(filter==='QUEST') return h.type.startsWith('QUEST');
+    if(filter==='LEVEL_UP') return h.type==='LEVEL_UP';
+    return true;
+  });
+  list.innerHTML = rows.map(r=>`<li><strong>${new Date(r.ts).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}</strong> ${r.type.replace('_',' ')} – ${r.summary||''}</li>`).join('');
+}
+
+function injectVersion(){
+  const el = document.getElementById('app-version'); if(el) el.textContent = '0.1';
+  const histFilters = document.querySelector('.history-filters');
+  histFilters?.addEventListener('click', e=>{
+    const t = e.target; if(!(t instanceof HTMLElement)) return;
+    if(!t.matches('[data-hfilter]')) return;
+    document.querySelectorAll('.hf-btn').forEach(b=>b.classList.remove('active'));
+    t.classList.add('active');
+    renderHistory();
+  });
 }
 
 export function handleExport(){

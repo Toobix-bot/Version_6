@@ -2,7 +2,7 @@
 "use strict";
 import { loadLocal, saveLocal, uuid, deepClone, emit } from './utils.js';
 import { xpNeeded, updateBase } from './logic.js';
-import { sanitizeArray, isEntry, isQuest, isStats, isProfile, isBase } from './schemas.js';
+import { sanitizeArray, isEntry, isQuest, isStats, isProfile, isBase, migrateStateIfNeeded } from './schemas.js';
 
 const STORAGE_KEY = 'echoRealmStateV1';
 const CONFIG_KEY = 'echoRealmConfigV1';
@@ -20,7 +20,8 @@ export function createInitialState(){
     entries: [],
     quests: [],
     history: [],
-    meta: { version: 1, updatedAt: now }
+  meta: { version: 1, updatedAt: now },
+  _lastEntryBackup: null
   };
 }
 
@@ -38,8 +39,9 @@ export function getConfig(){
 export function setConfig(cfg){ configCache = cfg; saveLocal(CONFIG_KEY, cfg); }
 
 export function loadState(){
-  const raw = loadLocal(STORAGE_KEY);
+  let raw = loadLocal(STORAGE_KEY);
   if(!raw) return state;
+  raw = migrateStateIfNeeded(raw);
   // Validate basic structure
   if(raw.profile && isProfile(raw.profile)) state.profile = raw.profile; 
   if(raw.stats && isStats(raw.stats)) state.stats = raw.stats; else state.stats = createInitialState().stats;
@@ -103,10 +105,25 @@ export function applyBaseProgress(){
 
 export function integrateEntryDerived(entry, derived){
   entry.derived = derived;
+  // Backup previous entry with same date for undo
+  const prev = state.entries.find(e=>e.date===entry.date);
+  state._lastEntryBackup = prev ? JSON.parse(JSON.stringify(prev)) : null;
   addEntry(entry);
   pushHistory('ENTRY_DERIVED', `XP +${derived.xpGained}`);
   saveState();
   emit('state:changed');
+}
+
+export function undoLastEntry(){
+  if(!state._lastEntryBackup) return false;
+  const idx = state.entries.findIndex(e=>e.date===state._lastEntryBackup.date);
+  if(idx>=0){ state.entries[idx] = state._lastEntryBackup; }
+  else state.entries.push(state._lastEntryBackup);
+  pushHistory('UNDO_ENTRY', state._lastEntryBackup.date);
+  state._lastEntryBackup = null;
+  saveState();
+  emit('state:changed');
+  return true;
 }
 
 export function exportState(){
