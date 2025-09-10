@@ -20,6 +20,7 @@ export function createInitialState(){
     entries: [],
     quests: [],
     history: [],
+  limits: { rerolls:{} },
   meta: { version: 1, updatedAt: now },
   _lastEntryBackup: null
   };
@@ -50,6 +51,7 @@ export function loadState(){
   state.entries = sanitizeArray(raw.entries, isEntry);
   state.quests = sanitizeArray(raw.quests, isQuest);
   state.history = Array.isArray(raw.history)? raw.history.slice(-1000): [];
+  state.limits = raw.limits || { rerolls:{} };
   state.meta = raw.meta || state.meta;
   return state;
 }

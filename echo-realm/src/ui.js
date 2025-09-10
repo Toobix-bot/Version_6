@@ -1,6 +1,7 @@
 /* ui.js - Render Funktionen */
 "use strict";
 import { getState, exportState, importState, saveState } from './state.js';
+import { rerollQuest } from './quests.js';
 import { on, formatXP, emit } from './utils.js';
 
 export function initUI(){
@@ -55,12 +56,15 @@ export function renderQuests(){
   const st = getState();
   const list = document.getElementById('quest-list'); if(!list) return;
   list.innerHTML = st.quests.slice(-50).reverse().map(q=>{
+  const d = new Date().toISOString().slice(0,10);
+  const used = st.limits?.rerolls?.[d] || 0;
+  const disableReroll = used>=2 || q.status!=='open';
     return `<li data-id="${q.id}" class="quest quest-${q.status}">
       <strong>${escapeHTML(q.title)}</strong> <span class="badge">${q.status}</span><br>
       <small>${escapeHTML(q.desc)}</small><br>
       <small>Reward: ${q.reward.xp} XP${q.reward.attribute? ' + '+Object.entries(q.reward.attribute).map(([k,v])=>`${k}+${v}`).join(', ') : ''}</small>
       <div class="quest-actions">
-        ${q.status==='open'? `<button data-action="done">Done</button><button data-action="skip">Skip</button>`: ''}
+    ${q.status==='open'? `<button data-action="done">Done</button><button data-action="skip">Skip</button><button data-action="reroll" ${disableReroll? 'disabled':''}>Reroll</button>`: ''}
       </div>
     </li>`;
   }).join('');

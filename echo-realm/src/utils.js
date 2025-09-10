@@ -64,20 +64,35 @@ export function formatStatDiff(diff){
 
 export function safeParseJSON(str){ try { return JSON.parse(str); } catch { return null; } }
 
-/** Simple debounce */
+/**
+ * Debounce: returns a function that delays invoking fn until after wait ms have
+ * elapsed since the last call.
+ * @template {(...a:any)=>any} F
+ * @param {F} fn
+ * @param {number} [wait=300]
+ * @returns {F}
+ */
 export function debounce(fn, wait=300){
-  let t; return function(...args){ clearTimeout(t); t = setTimeout(()=>fn.apply(this,args), wait); };
+  let t; // handle id
+  // @ts-ignore
+  return function(...args){
+    clearTimeout(t);
+    t = setTimeout(()=>fn.apply(this,args), wait);
+  };
 }
 
-/** Create a bounded undo stack */
+/**
+ * Creates a bounded LIFO undo stack.
+ * @param {number} [limit=10]
+ */
 export function createUndoStack(limit=10){
   /** @type {any[]} */
   const stack = [];
   return {
-    push(snap){ stack.push(snap); if(stack.length>limit) stack.shift(); },
-    pop(){ return stack.pop(); },
-    canUndo(){ return stack.length>0; },
-    size(){ return stack.length; },
+    /** @param {any} snap */ push(snap){ stack.push(snap); if(stack.length>limit) stack.shift(); },
+    /** @returns {any} */ pop(){ return stack.pop(); },
+    /** @returns {boolean} */ canUndo(){ return stack.length>0; },
+    /** @returns {number} */ size(){ return stack.length; },
     clear(){ stack.length=0; }
   };
 }
@@ -89,5 +104,9 @@ if(typeof window !== 'undefined' && window && !window.__ECHO_UTILS_TESTED__){
     console.assert(clamp(10,0,5)===5, 'clamp upper');
     console.assert(clamp(-1,0,5)===0, 'clamp lower');
     console.assert(wordCount('Hallo Welt  test')===3, 'wordCount');
+  // undo stack
+  const us = createUndoStack(2); us.push(1); us.push(2); us.push(3); console.assert(us.size()===2,'undo size limit'); console.assert(us.pop()===3,'undo pop');
+  // debounce test (best-effort)
+  let hits=0; const d = debounce(()=>{ hits++; }, 10); d(); d(); d(); setTimeout(()=>{ console.assert(hits===1,'debounce single fire'); },30);
   } catch(e){ console.warn('Utils self-test fail', e); }
 }

@@ -11,11 +11,13 @@
 import { getState, saveState, integrateEntryDerived, applyBaseProgress, getConfig, undoLastEntry } from './state.js';
 import { deriveFromEntry, applyEntryDerived, summarizeEntry as summarizeDerived } from './logic.js';
 import { initUI, handleExport, handleImport } from './ui.js';
-import { generateQuest, completeQuest, skipQuest } from './quests.js';
+import { generateQuest, completeQuest, skipQuest, rerollQuest } from './quests.js';
 import { todayISO, emit } from './utils.js';
 import { aiLocal } from './aiAdapter.js';
+import { requirePin } from './pin.js';
 
 function init(){
+  try { requirePin(); } catch {}
   // Set default date
   const dateInput = document.getElementById('entry-date');
   if(dateInput) dateInput.value = todayISO();
@@ -39,8 +41,9 @@ function init(){
     const li = target.closest('li[data-id]'); if(!li) return;
     const id = li.getAttribute('data-id'); if(!id) return;
     const action = target.getAttribute('data-action');
-    if(action==='done'){ completeQuest(id); }
-    if(action==='skip'){ skipQuest(id); }
+  if(action==='done'){ completeQuest(id); }
+  if(action==='skip'){ skipQuest(id); }
+  if(action==='reroll'){ rerollQuest(id); }
   });
 
   initUI();
