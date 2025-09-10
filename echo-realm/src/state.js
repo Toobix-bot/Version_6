@@ -1,6 +1,6 @@
 /* state.js - AppState, Load/Save, History */
 "use strict";
-import { loadLocal, saveLocal, uuid, deepClone, emit } from './utils.js';
+import { loadLocal, saveLocal, uuid, deepClone, emit, createUndoStack } from './utils.js';
 import { xpNeeded, updateBase } from './logic.js';
 import { sanitizeArray, isEntry, isQuest, isStats, isProfile, isBase, migrateStateIfNeeded } from './schemas.js';
 
@@ -26,6 +26,7 @@ export function createInitialState(){
 }
 
 let state = createInitialState();
+const entryUndoStack = createUndoStack(10);
 
 export function getState(){ return state; }
 
@@ -66,6 +67,8 @@ function pushHistory(type, summary){
 export function addEntry(entry){
   // replace existing date entry or push
   const idx = state.entries.findIndex(e=>e.date === entry.date);
+  if(idx>=0){ entryUndoStack.push(JSON.parse(JSON.stringify(state.entries[idx]))); }
+  else { entryUndoStack.push(null); }
   if(idx>=0) state.entries[idx] = entry; else state.entries.push(entry);
   pushHistory('ENTRY_ADDED', entry.derived ? `XP +${entry.derived.xpGained}` : 'entry');
   saveState();
@@ -115,12 +118,17 @@ export function integrateEntryDerived(entry, derived){
 }
 
 export function undoLastEntry(){
-  if(!state._lastEntryBackup) return false;
-  const idx = state.entries.findIndex(e=>e.date===state._lastEntryBackup.date);
-  if(idx>=0){ state.entries[idx] = state._lastEntryBackup; }
-  else state.entries.push(state._lastEntryBackup);
-  pushHistory('UNDO_ENTRY', state._lastEntryBackup.date);
-  state._lastEntryBackup = null;
+  const prev = entryUndoStack.pop();
+  if(prev===undefined) return false;
+  if(prev===null){
+    // means there was no previous entry, remove latest
+    state.entries.sort((a,b)=>a.date.localeCompare(b.date));
+    state.entries.pop();
+  } else {
+    const idx = state.entries.findIndex(e=>e.date===prev.date);
+    if(idx>=0) state.entries[idx] = prev; else state.entries.push(prev);
+  }
+  pushHistory('UNDO_ENTRY', 'letzter Eintrag');
   saveState();
   emit('state:changed');
   return true;

@@ -1,11 +1,19 @@
 /* main.js - Bootstrapping */
+/**
+ * COPILOT KICKOFF (Version_6)
+ * Bitte implementiere als Nächstes:
+ * 1) Autosave für Diary-Form (debounced 800ms) + Undo-Stack (max 10 Schritte)
+ * 2) Mini-Encounter: handleEncounter({stat:"fokus"}) → Ergebnis Toast + XP
+ * 3) UI: Basis-Tier-Badge mit Tooltip (Tier-Text aus state.base.tier)
+ * Beachte: ES-Modules, reine Render-Funktionen, JSDoc, keine externen Abhängigkeiten.
+ */
 "use strict";
 import { getState, saveState, integrateEntryDerived, applyBaseProgress, getConfig, undoLastEntry } from './state.js';
 import { deriveFromEntry, applyEntryDerived, summarizeEntry as summarizeDerived } from './logic.js';
 import { initUI, handleExport, handleImport } from './ui.js';
 import { generateQuest, completeQuest, skipQuest } from './quests.js';
 import { todayISO, emit } from './utils.js';
-import { summarizeEntry } from './aiAdapter.js';
+import { aiLocal } from './aiAdapter.js';
 
 function init(){
   // Set default date
@@ -36,6 +44,7 @@ function init(){
   });
 
   initUI();
+  setupAutosave();
 }
 
 async function onSubmitEntry(e){
@@ -58,7 +67,7 @@ async function onSubmitEntry(e){
   integrateEntryDerived(entry, derived);
   saveState();
   // Summarize (LLM Hook) - fallback summarization
-  try { const summary = await summarizeEntry(text, derived); showUndoToast(summary); } catch { showUndoToast('Gespeichert'); }
+  try { const summary = await aiLocal.summarizeEntry(text, derived); showUndoToast(summary); } catch { showUndoToast('Gespeichert'); }
   if(textEl) textEl.value='';
 }
 
@@ -80,3 +89,36 @@ function showUndoToast(summary){
 }
 
 document.addEventListener('DOMContentLoaded', init);
+
+// --- Autosave / Draft ---
+function setupAutosave(){
+  const textEl = document.getElementById('entry-text');
+  const moodEl = document.getElementById('mood');
+  const energyEl = document.getElementById('energy');
+  if(!textEl) return;
+  const DRAFT_KEY = 'echoRealmDraftV1';
+  // restore
+  try {
+    const raw = localStorage.getItem(DRAFT_KEY);
+    if(raw){
+      const j = JSON.parse(raw);
+      if(j.text && !textEl.value) textEl.value = j.text;
+      if(j.mood && moodEl && !moodEl.value) moodEl.value = j.mood;
+      if(j.energy && energyEl && !energyEl.value) energyEl.value = j.energy;
+    }
+  } catch {}
+  let t;
+  const handler = ()=>{
+    const draft = { text: textEl.value, mood: moodEl?.value||'', energy: energyEl?.value||'' };
+    try { localStorage.setItem(DRAFT_KEY, JSON.stringify(draft)); } catch {}
+  };
+  const debounced = (e)=>{ clearTimeout(t); t = setTimeout(handler, 800); };
+  ['input','change'].forEach(evt=>{
+    textEl.addEventListener(evt, debounced);
+    moodEl?.addEventListener(evt, debounced);
+    energyEl?.addEventListener(evt, debounced);
+  });
+  // clear draft on successful submit
+  const form = document.getElementById('entry-form');
+  form?.addEventListener('submit', ()=>{ localStorage.removeItem(DRAFT_KEY); });
+}

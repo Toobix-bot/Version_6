@@ -64,6 +64,24 @@ export function formatStatDiff(diff){
 
 export function safeParseJSON(str){ try { return JSON.parse(str); } catch { return null; } }
 
+/** Simple debounce */
+export function debounce(fn, wait=300){
+  let t; return function(...args){ clearTimeout(t); t = setTimeout(()=>fn.apply(this,args), wait); };
+}
+
+/** Create a bounded undo stack */
+export function createUndoStack(limit=10){
+  /** @type {any[]} */
+  const stack = [];
+  return {
+    push(snap){ stack.push(snap); if(stack.length>limit) stack.shift(); },
+    pop(){ return stack.pop(); },
+    canUndo(){ return stack.length>0; },
+    size(){ return stack.length; },
+    clear(){ stack.length=0; }
+  };
+}
+
 // --- Dev Self-Test (non-fatal) ---
 if(typeof window !== 'undefined' && window && !window.__ECHO_UTILS_TESTED__){
   window.__ECHO_UTILS_TESTED__ = true;
