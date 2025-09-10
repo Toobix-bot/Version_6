@@ -1,0 +1,11 @@
+{
+  "name": "echo-realm-dev-proxy",
+  "private": true,
+  "type": "module",
+  "version": "0.0.1",
+  "description": "Dev proxy for ECHO-REALM Groq integration (no client key)",
+  "scripts": {
+    "proxy": "node echo-realm/dev-proxy.js"
+  },
+  "engines": { "node": ">=18" }
+}

@@ -40,23 +40,18 @@
         <button id="btn-new-quest" type="button">Neue Quest</button>
         <button id="btn-export" type="button">Export</button>
         <label class="import-label">Import <input id="import-file" type="file" accept="application/json" hidden /></label>
-        <details id="ai-panel" style="margin-top:.5rem;">
-          <summary style="cursor:pointer;">AI</summary>
-          <div style="display:flex;flex-direction:column;gap:.25rem;margin-top:.4rem;">
-            <input type="password" id="groq-key" placeholder="Groq API Key" style="font-size:.7rem;padding:.25rem;" />
-            <div style="display:flex;gap:.25rem;">
-              <button type="button" id="btn-activate-groq" style="flex:1;">Groq aktivieren</button>
-              <button type="button" id="btn-ai-local" style="flex:1;">Local</button>
-              <button type="button" id="btn-groq-ping" title="Ping Groq API" style="flex:1;">Ping</button>
-            </div>
-            <small style="opacity:.6;font-size:.6rem;">Key bleibt nur im RAM, kein Persist.</small>
-          </div>
-        </details>
+        <div style="margin-top:.5rem;display:flex;gap:.4rem;align-items:center;flex-wrap:wrap;font-size:.65rem;">
+          <span id="ai-status" style="opacity:.75;">AI: local</span>
+          <button id="ai-toggle" type="button" style="font-size:.6rem;padding:.2rem .5rem;">Proxy an</button>
+        </div>
       </div>
     </section>
 
     <section id="quests-section">
       <h2>Quests</h2>
+      <div style="display:flex;gap:.5rem;flex-wrap:wrap;margin:.3rem 0 .6rem;">
+        <button type="button" id="btn-ai-quests" style="font-size:.6rem;">AI Quests</button>
+      </div>
       <ul id="quest-list"></ul>
     </section>
 

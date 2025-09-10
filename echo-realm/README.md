@@ -64,11 +64,15 @@ Falls ein PIN gesetzt (LocalStorage Hash), erscheint vor der UI ein Overlay. Rei
 Alles lokal. Keine Netzwerkrequests im MVP. Keine Secrets im LocalStorage speichern. PIN ist nur UX.
 
 ## Groq Integration (optional, experimentell)
-UI Panel ("AI") aufklappen, API Key einfügen → "Groq aktivieren". Key wird nicht gespeichert (nur RAM). "Local" schaltet zurück.
+Standardweg jetzt über lokalen Proxy (kein Key im Browser):
+1. `.env` anlegen: `GROQ_API_KEY=...`
+2. Proxy starten: `npm run proxy`
+3. App mit Hash öffnen: `index.html#ai=proxy`
+4. Status zeigt `AI: proxy`; Einträge triggern Zusammenfassung via Proxy.
 
-Intern: dynamisches Import von `aiGroq.js`, Strategy-Switch via `activateGroq()` / `activateLocal()`. Falls Request fehlschlägt → Toast + Fallback local.
+Fallback ohne Proxy: bleibt automatisch `AI: local`.
 
-Wichtig: Für produktive Nutzung besser Proxy/Edge-Funktion vorschalten, Keys niemals clientseitig hartcodieren.
+Intern: Proxy Strategy (`aiProxy.js`) ersetzt direkte Key-Nutzung. Key bleibt ausschließlich serverseitig im Prozess. Kein LocalStorage.
 
 ## Lizenz
 Siehe LICENSE (optional noch anzulegen).

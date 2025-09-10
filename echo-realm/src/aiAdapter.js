@@ -44,6 +44,11 @@ export function activateLocal(){
   _activeAI = aiLocal;
   if(_groqTimeoutId){ clearTimeout(_groqTimeoutId); _groqTimeoutId=null; }
 }
+/** Set a custom AI instance (proxy etc.) */
+export function setAI(instance){
+  if(_activeAI && _activeAI.dispose && _activeAI!==instance) try{ _activeAI.dispose(); }catch{}
+  _activeAI = instance || aiLocal;
+}
 /**
  * Activates Groq strategy dynamically. The key is kept only in memory.
  * If loading fails, remains on local.
