@@ -1,6 +1,6 @@
 /* state.js - AppState, Load/Save, History */
 "use strict";
-import { loadLocal, saveLocal, uuid, deepClone, emit, createUndoStack } from './utils.js';
+import { loadLocal, saveLocal, uuid, deepClone, emit, createUndoStack, debounce, todayISO } from './utils.js';
 import { xpNeeded, updateBase } from './logic.js';
 import { sanitizeArray, isEntry, isQuest, isStats, isProfile, isBase, migrateStateIfNeeded } from './schemas.js';
 
@@ -162,3 +162,77 @@ export function resetState(){ state = createInitialState(); saveState(); emit('s
 loadState();
 // Attempt async fetch of config.json (non-blocking)
 fetch('./data/config.json').then(r=>r.json()).then(cfg=>{ if(cfg && cfg.keywords){ setConfig(cfg); emit('state:changed'); } }).catch(()=>{});
+
+/**
+ * Enables per-day autosave for the diary entry form. Drafts are stored under
+ * LocalStorage keys: entry:draft:YYYY-MM-DD
+ * Restores an existing draft for the currently selected date on init.
+ * On date change loads the draft for the new date (non-destructive).
+ * On successful submit (form submit) the draft for that date is cleared.
+ * @param {HTMLFormElement|null} formEl The diary form element (#entry-form)
+ * @param {{ debounceMs?: number }} [opts]
+ * @returns {() => void} cleanup function to remove listeners
+ */
+export function enableAutosave(formEl, opts={}){
+  if(!formEl) return ()=>{};
+  const { debounceMs = 800 } = opts;
+  const textEl = formEl.querySelector('#entry-text');
+  const moodEl = formEl.querySelector('#mood');
+  const energyEl = formEl.querySelector('#energy');
+  const dateEl = formEl.querySelector('#entry-date');
+  if(!textEl) return ()=>{};
+
+  const DRAFT_PREFIX = 'entry:draft:';
+  const draftKey = (date)=> DRAFT_PREFIX + (date || todayISO());
+
+  function loadDraft(forDate){
+    try {
+      const raw = localStorage.getItem(draftKey(forDate));
+      if(!raw) return;
+      const j = JSON.parse(raw);
+      if(j && typeof j === 'object'){
+        if(j.text != null && !textEl.value) textEl.value = j.text;
+        if(j.mood != null && moodEl && !moodEl.value) moodEl.value = j.mood;
+        if(j.energy != null && energyEl && !energyEl.value) energyEl.value = j.energy;
+      }
+    } catch {}
+  }
+
+  // initial restore for current date
+  loadDraft(dateEl?.value || todayISO());
+
+  const saveDraft = ()=>{
+    const date = dateEl?.value || todayISO();
+    const draft = { text: textEl.value, mood: moodEl?.value||'', energy: energyEl?.value||'' };
+    try { localStorage.setItem(draftKey(date), JSON.stringify(draft)); } catch {}
+  };
+  const debouncedSave = debounce(saveDraft, debounceMs);
+
+  const inputs = [textEl, moodEl, energyEl].filter(Boolean);
+  inputs.forEach(el=>{
+    el.addEventListener('input', debouncedSave);
+    el.addEventListener('change', debouncedSave);
+  });
+
+  // When date changes, attempt to load that day's draft (do not overwrite existing manual input)
+  dateEl?.addEventListener('change', ()=>{
+    loadDraft(dateEl.value);
+  });
+
+  // Clear draft on submit success
+  const submitHandler = ()=>{
+    const d = dateEl?.value || todayISO();
+    try { localStorage.removeItem(draftKey(d)); } catch {}
+  };
+  formEl.addEventListener('submit', submitHandler);
+
+  // cleanup
+  return () => {
+    inputs.forEach(el=>{
+      el.removeEventListener('input', debouncedSave);
+      el.removeEventListener('change', debouncedSave);
+    });
+    dateEl?.removeEventListener('change', loadDraft);
+    formEl.removeEventListener('submit', submitHandler);
+  };
+}

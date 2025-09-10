@@ -63,11 +63,12 @@ Falls ein PIN gesetzt (LocalStorage Hash), erscheint vor der UI ein Overlay. Rei
 ## Datenschutz
 Alles lokal. Keine Netzwerkrequests im MVP. Keine Secrets im LocalStorage speichern. PIN ist nur UX.
 
-## Groq Setup (später)
-1. Separates Modul `aiGroq.js` (nicht im Bundle API-Key hardcodieren).
-2. Proxy / Server-seitige Edge Function für echte API-Aufrufe.
-3. `aiAdapter.js`: `ai('groq')` instanziieren, Fallback auf `local` bei Fehler.
-4. Keine Keys in Git committen; `.env` nur lokal.
+## Groq Integration (optional, experimentell)
+UI Panel ("AI") aufklappen, API Key einfügen → "Groq aktivieren". Key wird nicht gespeichert (nur RAM). "Local" schaltet zurück.
+
+Intern: dynamisches Import von `aiGroq.js`, Strategy-Switch via `activateGroq()` / `activateLocal()`. Falls Request fehlschlägt → Toast + Fallback local.
+
+Wichtig: Für produktive Nutzung besser Proxy/Edge-Funktion vorschalten, Keys niemals clientseitig hartcodieren.
 
 ## Lizenz
 Siehe LICENSE (optional noch anzulegen).

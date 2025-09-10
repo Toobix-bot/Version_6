@@ -1,0 +1,24 @@
+# Environment secrets (never commit real keys)
+.env
+.env.local
+.env.*.local
+
+# OS / Editor
+.DS_Store
+Thumbs.db
+.vscode/
+
+# Node (if added later)
+node_modules/
+
+# Logs / temp
+*.log
+ npm-debug.log*
+
+# Exports / backups
+*.json.backup
+ echo-realm-export*.json
+
+# Misc build artifacts (future)
+dist/
+build/
